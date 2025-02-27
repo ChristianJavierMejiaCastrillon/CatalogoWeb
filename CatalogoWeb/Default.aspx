@@ -1,44 +1,40 @@
-﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="CatalogoWeb._Default" %>
+﻿<%@ Page Title="Catálogo de Productos" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="CatalogoWeb.Default" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+    <h2 class="text-center">Catálogo de Productos</h2>
 
-    <main>
-        <section class="row" aria-labelledby="aspnetTitle">
-            <h1 id="aspnetTitle">ASP.NET</h1>
-            <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-            <p><a href="http://www.asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-        </section>
-
-        <div class="row">
-            <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-                <h2 id="gettingStartedTitle">Getting started</h2>
-                <p>
-                    ASP.NET Web Forms lets you build dynamic websites using a familiar drag-and-drop, event-driven model.
-                A design surface and hundreds of controls and components let you rapidly build sophisticated, powerful UI-driven sites with data access.
-                </p>
-                <p>
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301948">Learn more &raquo;</a>
-                </p>
-            </section>
-            <section class="col-md-4" aria-labelledby="librariesTitle">
-                <h2 id="librariesTitle">Get more libraries</h2>
-                <p>
-                    NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.
-                </p>
-                <p>
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301949">Learn more &raquo;</a>
-                </p>
-            </section>
-            <section class="col-md-4" aria-labelledby="hostingTitle">
-                <h2 id="hostingTitle">Web Hosting</h2>
-                <p>
-                    You can easily find a web hosting company that offers the right mix of features and price for your applications.
-                </p>
-                <p>
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301950">Learn more &raquo;</a>
-                </p>
-            </section>
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <asp:TextBox ID="txtFiltroNombre" CssClass="form-control" runat="server" Placeholder="Buscar por nombre..." />
         </div>
-    </main>
+        <div class="col-md-3">
+            <asp:DropDownList ID="ddlFiltroMarca" CssClass="form-control" runat="server"></asp:DropDownList>
+        </div>
+        <div class="col-md-3">
+            <asp:DropDownList ID="ddlFiltroCategoria" CssClass="form-control" runat="server"></asp:DropDownList>
+        </div>
+        <div class="col-md-2">
+            <asp:Button ID="btnBuscar" CssClass="btn btn-primary" runat="server" Text="Buscar" OnClick="btnBuscar_Click" />
+        </div>
+    </div>
+
+    <!-- GridView para mostrar los productos -->
+    <asp:GridView ID="gvProductos" CssClass="table table-bordered table-striped" runat="server" AutoGenerateColumns="False">
+        <Columns>
+            <asp:BoundField DataField="Codigo" HeaderText="Código" />
+            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+            <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
+            <asp:BoundField DataField="Marca" HeaderText="Marca" />
+            <asp:BoundField DataField="Categoria" HeaderText="Categoría" />
+            <asp:BoundField DataField="Precio" HeaderText="Precio" DataFormatString="{0:C}" />
+            <asp:TemplateField HeaderText="Imagen">
+                <ItemTemplate>
+                    <img src='<%# Eval("ImagenUrl") %>' alt="Imagen" style="width: 100px; height: auto;" />
+                </ItemTemplate>
+            </asp:TemplateField>
+        </Columns>
+    </asp:GridView>
 
 </asp:Content>
+

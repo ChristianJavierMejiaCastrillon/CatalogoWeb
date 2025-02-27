@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogoWeb", "CatalogoWeb\CatalogoWeb.csproj", "{B14CD59C-9ABB-4524-A657-CE963E36CA25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dominio", "Dominio\Dominio.csproj", "{C86E0353-944B-4246-A551-A6DF572E1302}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datos", "Datos\Datos.csproj", "{6366EFA1-AE23-49ED-91B4-A49BB4B1BF34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +19,19 @@ Global
 		{B14CD59C-9ABB-4524-A657-CE963E36CA25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B14CD59C-9ABB-4524-A657-CE963E36CA25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B14CD59C-9ABB-4524-A657-CE963E36CA25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C86E0353-944B-4246-A551-A6DF572E1302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C86E0353-944B-4246-A551-A6DF572E1302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C86E0353-944B-4246-A551-A6DF572E1302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C86E0353-944B-4246-A551-A6DF572E1302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6366EFA1-AE23-49ED-91B4-A49BB4B1BF34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6366EFA1-AE23-49ED-91B4-A49BB4B1BF34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6366EFA1-AE23-49ED-91B4-A49BB4B1BF34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6366EFA1-AE23-49ED-91B4-A49BB4B1BF34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8867A12-32AC-4599-9F44-2A5B47FB3880}
 	EndGlobalSection
 EndGlobal

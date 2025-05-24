@@ -68,5 +68,50 @@ namespace Datos
             }
             return lista;
         }
+
+        public Articulo ObtenerPorId(int id)
+        {
+            Articulo articulo = null;
+
+            try
+            {
+                using (SqlConnection conexion = new SqlConnection(connectionString))
+                {
+                    conexion.Open();
+                    using (SqlCommand comando = new SqlCommand("SELECT A.Id, A.Codigo, A.Nombre, A.Descripcion, M.Descripcion AS Marca, C.Descripcion AS Categoria, A.ImagenUrl, A.Precio " +
+                                                               "FROM ARTICULOS A " +
+                                                               "INNER JOIN MARCAS M ON A.IdMarca = M.Id " +
+                                                               "INNER JOIN CATEGORIAS C ON A.IdCategoria = C.Id " +
+                                                               "WHERE A.Id = @id", conexion))
+                    {
+                        comando.Parameters.AddWithValue("@id", id);
+
+                        using (SqlDataReader lector = comando.ExecuteReader())
+                        {
+                            if (lector.Read())
+                            {
+                                articulo = new Articulo
+                                {
+                                    Id = Convert.ToInt32(lector["Id"]),
+                                    Codigo = lector["Codigo"].ToString(),
+                                    Nombre = lector["Nombre"].ToString(),
+                                    Descripcion = lector["Descripcion"].ToString(),
+                                    Marca = new Marca { Descripcion = lector["Marca"].ToString() },
+                                    Categoria = new Categoria { Descripcion = lector["Categoria"].ToString() },
+                                    ImagenUrl = lector["ImagenUrl"].ToString(),
+                                    Precio = Convert.ToDecimal(lector["Precio"])
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener el producto: " + ex.Message);
+            }
+
+            return articulo;
+        }
     }
 }

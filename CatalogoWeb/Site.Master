@@ -51,6 +51,16 @@
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Login.aspx">Iniciar Sesión</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Admin/Productos.aspx">Administrar Productos</a></li>
                     </ul>
+                    <% if (Session["IdUser"] != null)
+                        { %>
+                    <ul class="navbar-nav d-flex align-items-center" style="margin-left: auto;">
+                        <li class="nav-item d-flex align-items-center" style="color: white; padding-right: 10px;">
+                            <span style="margin-right: 10px;">Bienvenido, <strong><%: Session["Nombre"] %></strong>
+                            </span>
+                            <a class="btn btn-sm btn-outline-light" runat="server" href="~/Logout.aspx">Cerrar Sesión</a>
+                        </li>
+                    </ul>
+                    <% } %>
                 </div>
             </div>
         </nav>

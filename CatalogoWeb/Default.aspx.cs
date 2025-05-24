@@ -82,5 +82,11 @@ namespace CatalogoWeb
             gvProductos.DataSource = listaProductos;
             gvProductos.DataBind();
         }
+
+        protected void gvProductos_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvProductos.PageIndex = e.NewPageIndex;
+            CargarProductos(); // Recarga los productos con la nueva página seleccionada
+        }
     }
 }

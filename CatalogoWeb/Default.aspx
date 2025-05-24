@@ -20,10 +20,20 @@
     </div>
 
     <!-- GridView para mostrar los productos -->
-    <asp:GridView ID="gvProductos" CssClass="table table-bordered table-striped" runat="server" AutoGenerateColumns="False">
+    <asp:GridView ID="gvProductos" CssClass="table table-bordered table-striped" runat="server" AutoGenerateColumns="False" AllowPaging="True" PageSize="10"
+        OnPageIndexChanging="gvProductos_PageIndexChanging">
+
         <Columns>
             <asp:BoundField DataField="Codigo" HeaderText="Código" />
-            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+
+            <asp:TemplateField HeaderText="Nombre">
+                <ItemTemplate>
+                    <a href='DetalleProducto.aspx?id=<%# Eval("Id") %>'>
+                        <%# Eval("Nombre") %>
+                </a>
+                </ItemTemplate>
+            </asp:TemplateField>
+
             <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
             <asp:BoundField DataField="Marca" HeaderText="Marca" />
             <asp:BoundField DataField="Categoria" HeaderText="Categoría" />
@@ -35,6 +45,4 @@
             </asp:TemplateField>
         </Columns>
     </asp:GridView>
-
 </asp:Content>
-

@@ -22,7 +22,7 @@ namespace CatalogoWeb
 
             try
             {
-                using (SqlConnection conexion = new SqlConnection("server=POWER\\SQLEXPRESS; database=CATALOGO_WEB_DB; integrated security=true"))
+                using (SqlConnection conexion = new SqlConnection(@"Data Source=DESKTOP-BMT25TC\SQLEXPRESS;Initial Catalog=CATALOGO_WEB_DB;Integrated Security=True;Encrypt=False;MultipleActiveResultSets=True"))
                 {
                     conexion.Open();
                     string query = "SELECT Id, Nombre, Apellido, Admin FROM USERS WHERE Email = @email AND Pass = @password";

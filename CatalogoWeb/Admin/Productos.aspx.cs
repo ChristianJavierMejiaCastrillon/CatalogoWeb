@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Datos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -21,10 +22,35 @@ namespace CatalogoWeb.Admin
             // ✅ Paso 2: Ejecutar solo la primera vez que se carga la página
             if (!IsPostBack)
             {
-                // Aquí luego iría el código para cargar productos desde la base de datos
-                // Por ahora podemos dejar un comentario temporal
-                // Ejemplo: CargarListaDeProductos();
+                CargarProductos();
+            }
+
+        }
+        
+            private void CargarProductos()
+        {
+            ArticuloDatos datos = new ArticuloDatos();
+            gvAdminProductos.DataSource = datos.Listar();
+            gvAdminProductos.DataBind();
+        }
+
+        protected void gvAdminProductos_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "Eliminar")
+            {
+                // Obtener el índice de la fila
+                int index = Convert.ToInt32(e.CommandArgument);
+
+                // Obtener el código del producto desde la fila seleccionada
+                string codigo = gvAdminProductos.DataKeys[index].Value.ToString();
+
+                // Llamar al método para eliminar
+                ArticuloDatos datos = new ArticuloDatos();
+                datos.Eliminar(codigo);
+
+                // Recargar el GridView
+                CargarProductos();
             }
         }
-	}
+    }
 }

@@ -8,7 +8,8 @@ namespace Datos
 {
     public class ArticuloDatos
     {
-        private string connectionString = "server=POWER\\SQLEXPRESS; database=CATALOGO_WEB_DB; integrated security=true";
+        private readonly string connectionString = @"Data Source=localhost\SQLEXPRESS;Initial Catalog=CATALOGO_WEB_DB;Integrated Security=True;Encrypt=False;MultipleActiveResultSets=True";
+
 
         public List<Articulo> Listar(string nombre = null, string marca = null, string categoria = null)
         {
@@ -113,5 +114,26 @@ namespace Datos
 
             return articulo;
         }
+
+        public void Eliminar(string codigo)
+        {
+            try
+            {
+                using (SqlConnection conexion = new SqlConnection(connectionString))
+                {
+                    conexion.Open();
+                    using (SqlCommand comando = new SqlCommand("DELETE FROM ARTICULOS WHERE Codigo = @codigo", conexion))
+                    {
+                        comando.Parameters.AddWithValue("@codigo", codigo);
+                        comando.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al eliminar el producto: " + ex.Message);
+            }
+        }
+
     }
 }

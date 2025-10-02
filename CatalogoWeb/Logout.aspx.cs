@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
+using System.Web.Security;
 
 namespace CatalogoWeb
 {
@@ -11,10 +9,15 @@ namespace CatalogoWeb
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            Session.Clear();     // Borra todas las variables de sesión
-            Session.Abandon();   // Finaliza la sesión del usuario
+            // Cierra Forms Authentication
+            FormsAuthentication.SignOut();
 
-            Response.Redirect("Default.aspx"); // Redirige al inicio
+            // Limpia la sesión
+            Session.Clear();
+            Session.Abandon();
+
+            // Redirige al inicio
+            Response.Redirect("~/Default.aspx");
         }
     }
 }

@@ -30,17 +30,20 @@
                 <ItemTemplate>
                     <a href='DetalleProducto.aspx?id=<%# Eval("Id") %>'>
                         <%# Eval("Nombre") %>
-                </a>
+                    </a>
                 </ItemTemplate>
             </asp:TemplateField>
 
             <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
             <asp:BoundField DataField="Marca" HeaderText="Marca" />
             <asp:BoundField DataField="Categoria" HeaderText="Categoría" />
-            <asp:BoundField DataField="Precio" HeaderText="Precio" DataFormatString="{0:C}" />
+            <asp:BoundField DataField="Precio" HeaderText="Precio" DataFormatString="{0:C}" HtmlEncode="false" />
+
             <asp:TemplateField HeaderText="Imagen">
                 <ItemTemplate>
-                    <img src='<%# Eval("ImagenUrl") %>' alt="Imagen" style="width: 100px; height: auto;" />
+                    <asp:Image ID="imgProducto" runat="server"
+                        ImageUrl='<%# ResolveUrl(Convert.ToString(Eval("ImagenUrl") ?? "")) %>'
+                        Width="100" />
                 </ItemTemplate>
             </asp:TemplateField>
         </Columns>

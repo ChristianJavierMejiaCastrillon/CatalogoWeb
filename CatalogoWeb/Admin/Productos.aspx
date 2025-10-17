@@ -5,6 +5,12 @@
         <h2>Panel de Administración - Productos</h2>
         <hr />
 
+        <asp:Button ID="btnNuevo" runat="server" Text="➕ Nuevo producto"
+            CssClass="btn btn-outline-primary mb-3 fw-bold" OnClick="btnNuevo_Click" />
+        
+        <!-- Aviso -->
+        <asp:Label ID="lblAviso" runat="server" Visible="false"></asp:Label>
+
         <asp:Label ID="lblMensaje" runat="server" ForeColor="Red" />
 
         <asp:GridView ID="gvAdminProductos" runat="server"

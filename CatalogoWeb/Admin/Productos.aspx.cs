@@ -18,7 +18,6 @@ namespace CatalogoWeb.Admin
             // 1) Debe estar autenticado por Forms (si no, al Login con ReturnUrl correcto)
             if (!Request.IsAuthenticated)
             {
-                // Esto agrega ?ReturnUrl=...
                 System.Web.Security.FormsAuthentication.RedirectToLoginPage();
                 return;
             }
@@ -39,7 +38,40 @@ namespace CatalogoWeb.Admin
             Page.Form.Enctype = "multipart/form-data";
 
             if (!IsPostBack)
+            {
                 CargarProductos();
+
+                // --- NUEVO: mostrar aviso si viene ?msg= ---
+                var msg = Request.QueryString["msg"];
+                lblAviso.Visible = false;
+
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    lblAviso.Visible = true;
+                    switch (msg.ToLowerInvariant())
+                    {
+                        case "creado":
+                            lblAviso.CssClass = "alert alert-success d-block";
+                            lblAviso.Text = "✅ Producto creado correctamente.";
+                            break;
+
+                        case "actualizado":
+                            lblAviso.CssClass = "alert alert-info d-block";
+                            lblAviso.Text = "ℹ️ Producto actualizado.";
+                            break;
+
+                        case "eliminado":
+                            lblAviso.CssClass = "alert alert-warning d-block";
+                            lblAviso.Text = "⚠️ Producto eliminado.";
+                            break;
+
+                        default:
+                            // Mensaje desconocido: no mostramos nada
+                            lblAviso.Visible = false;
+                            break;
+                    }
+                }
+            }
         }
 
         private void CargarProductos()
@@ -238,8 +270,9 @@ namespace CatalogoWeb.Admin
                 cmd.ExecuteNonQuery();
             }
 
-            gvAdminProductos.EditIndex = -1;
-            CargarProductos();
+            // Importante: redirigir para evitar reenvío y mostrar el aviso
+            Response.Redirect("~/Admin/Productos.aspx?msg=actualizado", endResponse: false);
+            return;
         }
 
 
@@ -258,7 +291,9 @@ namespace CatalogoWeb.Admin
                     cmd.ExecuteNonQuery();
                 }
 
-                CargarProductos();
+                // Redirige para mostrar aviso y evitar reenvío
+                Response.Redirect("~/Admin/Productos.aspx?msg=eliminado", endResponse: false);
+                return;
             }
         }
 
@@ -276,6 +311,11 @@ namespace CatalogoWeb.Admin
 
             string alt = input.Replace(',', '.');
             return decimal.TryParse(alt, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out value);
+        }
+
+        protected void btnNuevo_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Admin/NuevoProducto.aspx");
         }
     }
  }

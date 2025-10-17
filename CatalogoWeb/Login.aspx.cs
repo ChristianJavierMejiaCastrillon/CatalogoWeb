@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Security;
-
 namespace CatalogoWeb
 {
     public partial class Login : System.Web.UI.Page
@@ -11,14 +10,12 @@ namespace CatalogoWeb
         {
             string email = txtEmail.Text.Trim();
             string password = txtPassword.Text.Trim();
-
             try
             {
                 string cnx = ConfigurationManager.ConnectionStrings["CATALOGO_WEB_DB"].ConnectionString;
                 using (SqlConnection conexion = new SqlConnection(cnx))
                 {
                     conexion.Open();
-
                     string query = @"SELECT Id, Nombre, Apellido, Admin
                              FROM USERS
                              WHERE Email = @email AND Pass = @password";
@@ -71,7 +68,6 @@ namespace CatalogoWeb
                 lblMensaje.Text = "Error al iniciar sesión: " + ex.Message;
             }
         }
-
         // Para evitar open-redirect; solo aceptamos rutas locales
         private bool UrlIsLocal(string url)
         {

@@ -13,7 +13,8 @@ Su objetivo es gestionar un **catálogo de productos** con panel de administraci
 - Mensajes dinámicos de Bootstrap (creado, actualizado, eliminado)  
 - Redirección segura y recarga automática del GridView  
 - Conexión con tablas `ARTICULOS`, `MARCAS` y `CATEGORIAS`
-
+- Implementar formularios para agregar **nuevas Marcas y Categorías** desde el panel de administración.  
+- Mejorar el diseño con filtros y búsqueda dinámica de productos.
 ---
 
 ## ⚙️ Tecnologías utilizadas
@@ -26,8 +27,7 @@ Su objetivo es gestionar un **catálogo de productos** con panel de administraci
 ---
 
 ## 🧠 Próximo objetivo
-- Implementar formularios para agregar **nuevas Marcas y Categorías** desde el panel de administración.  
-- Mejorar el diseño con filtros y búsqueda dinámica de productos.
+
 
 ---
 

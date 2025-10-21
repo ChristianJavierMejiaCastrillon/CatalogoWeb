@@ -7,7 +7,7 @@
 
         <asp:Button ID="btnNuevo" runat="server" Text="➕ Nuevo producto"
             CssClass="btn btn-outline-primary mb-3 fw-bold" OnClick="btnNuevo_Click" />
-        
+
         <!-- Aviso -->
         <asp:Label ID="lblAviso" runat="server" Visible="false"></asp:Label>
 
@@ -45,21 +45,27 @@
                     </EditItemTemplate>
                 </asp:TemplateField>
 
-                <%-- Marca --%>
+                <%-- Vista normal --%>
                 <asp:TemplateField HeaderText="Marca">
-                    <ItemTemplate><%# Eval("MarcaNombre") %></ItemTemplate>
+                    <ItemTemplate>
+                        <%# string.IsNullOrEmpty(Eval("MarcaNombre") as string) ? "(Sin marca)" : Eval("MarcaNombre") %>
+                    </ItemTemplate>
+
+                    <%-- Modo edición: DropDown--%>
                     <EditItemTemplate>
-                        <asp:DropDownList ID="ddlMarca" runat="server" CssClass="form-select"></asp:DropDownList>
                         <asp:HiddenField ID="hdMarcaIdActual" runat="server" Value='<%# Eval("MarcaId") %>' />
+                        <asp:DropDownList ID="ddlMarca" runat="server" CssClass="form-select form-select-sm"></asp:DropDownList>
                     </EditItemTemplate>
                 </asp:TemplateField>
 
-                <%-- Categoria --%>
                 <asp:TemplateField HeaderText="Categoría">
-                    <ItemTemplate><%# Eval("CategoriaNombre") %></ItemTemplate>
+                    <ItemTemplate>
+                        <%# string.IsNullOrEmpty(Eval("CategoriaNombre") as string) ? "(Sin categoría)" : Eval("CategoriaNombre") %>
+                    </ItemTemplate>
+
                     <EditItemTemplate>
-                        <asp:DropDownList ID="ddlCategoria" runat="server" CssClass="form-select"></asp:DropDownList>
                         <asp:HiddenField ID="hdCategoriaIdActual" runat="server" Value='<%# Eval("CategoriaId") %>' />
+                        <asp:DropDownList ID="ddlCategoria" runat="server" CssClass="form-select form-select-sm"></asp:DropDownList>
                     </EditItemTemplate>
                 </asp:TemplateField>
 

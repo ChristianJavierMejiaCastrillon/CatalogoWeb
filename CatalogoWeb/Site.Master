@@ -7,7 +7,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> - Mi aplicación ASP.NET</title>
+    <title><%: System.Configuration.ConfigurationManager.AppSettings["AppName"] ?? "Mi aplicación" %> - <%: Page.Title %></title>
+
 
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/bundles/modernizr") %>
@@ -15,8 +16,8 @@
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-
 </head>
+
 <body>
     <form runat="server">
         <asp:ScriptManager runat="server">
@@ -40,23 +41,41 @@
 
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" runat="server" href="~/">Nombre de la aplicación</a>
+                <a class="navbar-brand" runat="server" href="~/">
+                    <%: System.Configuration.ConfigurationManager.AppSettings["AppName"] ?? "Mi aplicación" %>
+                </a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Default.aspx">Inicio</a></li>
+
+                        <%-- Mostrar "Iniciar Sesión" SOLO si NO hay usuario --%>
+                        <% if (Session["IdUser"] == null)
+                            { %>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Login.aspx">Iniciar Sesión</a></li>
+                        <% } %>
+
+                        <%-- Menú de administración SOLO si hay sesión (y opcionalmente si es admin) --%>
+                        <% 
+                            bool esAdmin = (Session["IsAdmin"] is bool b && b) || (Session["Admin"] is bool c && c);
+                            if (Session["IdUser"] != null && esAdmin)
+                            { %>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Admin/Productos.aspx">Administrar Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Admin/Marcas.aspx">Marcas</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Admin/Categorias.aspx">Categorías</a></li>
+                        <% } %>
                     </ul>
+
+                    <%-- Bloque de "Bienvenido" y "Cerrar Sesión" --%>
                     <% if (Session["IdUser"] != null)
                         { %>
                     <ul class="navbar-nav d-flex align-items-center" style="margin-left: auto;">
                         <li class="nav-item d-flex align-items-center" style="color: white; padding-right: 10px;">
-                            <span style="margin-right: 10px;">Bienvenido, <strong><%: Session["Nombre"] %></strong>
-                            </span>
+                            <span style="margin-right: 10px;">Bienvenido, <strong><%: Session["Nombre"] %></strong></span>
                             <a class="btn btn-sm btn-outline-light" runat="server" href="~/Logout.aspx">Cerrar Sesión</a>
                         </li>
                     </ul>
@@ -64,17 +83,51 @@
                 </div>
             </div>
         </nav>
-        <div class="container body-content">
+        <div class="container py-4">
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
             <hr />
             <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - Mi aplicación ASP.NET</p>
+                <p>
+                    &copy; <%: DateTime.Now.Year %> - <%: System.Configuration.ConfigurationManager.AppSettings["AppName"] ?? "Mi aplicación" %>
+                </p>
             </footer>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- Modal genérico para mensajes (reutilizable en todo el sitio) -->
+        <!-- ========================================================= -->
+        <div class="modal fade" id="appModalMsg" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="appModalMsgTitle">Mensaje</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body" id="appModalMsgBody">...</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </form>
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
+
+    <script type="text/javascript">
+        // Muestra el modal con un título y un cuerpo de mensaje
+        function showAppMessage(title, body) {
+            var t = document.getElementById('appModalMsgTitle');
+            var b = document.getElementById('appModalMsgBody');
+            if (t) t.innerText = title || 'Mensaje';
+            if (b) b.innerText = body || '';
+            var modal = new bootstrap.Modal(document.getElementById('appModalMsg'));
+            modal.show();
+        }
+    </script>
+
 </body>
 </html>

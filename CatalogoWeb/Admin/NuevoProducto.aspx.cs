@@ -161,9 +161,23 @@ namespace CatalogoWeb.Admin
                     int rows = cmd.ExecuteNonQuery();
 
                     if (rows > 0)
-                        Response.Redirect("~/Admin/Productos.aspx?msg=creado", endResponse: false);
+                    {
+                        // Antes usábamos Redirect; ahora mostramos modal de éxito
+                        ShowModal("Éxito", "Producto guardado correctamente ✅");
+
+                        // Limpiar el formulario para que quede listo para otro producto
+                        txtCodigo.Text = "";
+                        txtNombre.Text = "";
+                        txtDescripcion.Text = "";
+                        txtPrecio.Text = "";
+                        txtImagenUrl.Text = "";
+                        ddlCategoria.SelectedIndex = 0;
+                        ddlMarca.SelectedIndex = 0;
+                    }
                     else
+                    {
                         ShowMsg("No se pudo guardar el producto. Intenta de nuevo.", isError: true);
+                    }
                 }
             }
             catch (Exception ex)
@@ -219,6 +233,21 @@ namespace CatalogoWeb.Admin
                 ShowMsg("Error al validar código: " + ex.Message, isError: true);
                 return false; // Si hay error, no bloquear el guardado
             }
+        }
+        private void ShowModal(string titulo, string mensaje)
+        {
+            string safeTitle = HttpUtility.JavaScriptStringEncode(titulo ?? "Mensaje");
+            string safeBody = HttpUtility.JavaScriptStringEncode(mensaje ?? "");
+
+            string js = $"setTimeout(function(){{ showAppMessage('{safeTitle}','{safeBody}'); }}, 150);";
+
+            ScriptManager.RegisterStartupScript(
+                Page,                          // página actual
+                Page.GetType(),                // tipo
+                Guid.NewGuid().ToString(),     // key única
+                js,                            // script a ejecutar
+                true                           // que agregue <script> ... </script>
+            );
         }
     }
 }

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace CatalogoWeb.Admin
@@ -70,6 +73,18 @@ namespace CatalogoWeb.Admin
                             lblAviso.Visible = false;
                             break;
                     }
+                }
+                // ----- PRUEBA TEMPORAL -----
+                if (Request.QueryString["testmodal"] == "1")
+                {
+                    string js = "setTimeout(function(){ showAppMessage('Productos','Prueba de modal desde code-behind ✔'); }, 150);";
+                    ScriptManager.RegisterStartupScript(
+                        Page,
+                        Page.GetType(),
+                        "modalTest",
+                        js,
+                        true
+                    );
                 }
             }
         }
@@ -323,6 +338,53 @@ namespace CatalogoWeb.Admin
         protected void btnNuevo_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/Admin/NuevoProducto.aspx");
+        }
+        private void ShowModal(string titulo, string mensaje)
+        {
+            // Escapa comillas y caracteres especiales para JS
+            string safeTitle = HttpUtility.JavaScriptStringEncode(titulo ?? "Mensaje");
+            string safeBody = HttpUtility.JavaScriptStringEncode(mensaje ?? "");
+            string js = $"showAppMessage('{safeTitle}','{safeBody}');";
+
+            // Usa ScriptManager (funciona con UpdatePanel también)
+            ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(), js, true);
+        }
+        private decimal ParsePrecio(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                throw new ArgumentException("El precio es obligatorio.");
+
+            // admite coma o punto como separador decimal
+            string norm = input.Trim().Replace(',', '.');
+
+            if (!decimal.TryParse(norm, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var precio))
+                throw new ArgumentException("Formato de precio inválido. Usa 99.99 o 99,99.");
+
+            if (precio <= 0) throw new ArgumentException("El precio debe ser mayor a 0.");
+            return decimal.Round(precio, 2);
+        }
+        private bool CodigoExiste(string codigo)
+        {
+            const string sql = "SELECT COUNT(1) FROM PRODUCTOS WHERE Codigo=@Codigo";
+            using (var cn = new SqlConnection(Cnx))
+            using (var cmd = new SqlCommand(sql, cn))
+            {
+                cmd.Parameters.AddWithValue("@Codigo", codigo);
+                cn.Open();
+                return (int)cmd.ExecuteScalar() > 0;
+            }
+        }
+        private bool CodigoUsadoPorOtro(string codigoNuevo, string codigoActual)
+        {
+            const string sql = "SELECT COUNT(1) FROM PRODUCTOS WHERE Codigo=@Nuevo AND Codigo<>@Actual";
+            using (var cn = new SqlConnection(Cnx))
+            using (var cmd = new SqlCommand(sql, cn))
+            {
+                cmd.Parameters.AddWithValue("@Nuevo", codigoNuevo);
+                cmd.Parameters.AddWithValue("@Actual", codigoActual);
+                cn.Open();
+                return (int)cmd.ExecuteScalar() > 0;
+            }
         }
     }
  }

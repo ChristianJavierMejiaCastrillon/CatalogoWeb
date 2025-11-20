@@ -5,14 +5,17 @@
         <h2>Panel de Administración - Productos</h2>
         <hr />
 
+        <!-- Botón "Nuevo" -->
         <asp:Button ID="btnNuevo" runat="server" Text="➕ Nuevo producto"
             CssClass="btn btn-outline-primary mb-3 fw-bold" OnClick="btnNuevo_Click" />
 
-        <!-- Aviso -->
+        <!-- Avisos -->
         <asp:Label ID="lblAviso" runat="server" Visible="false"></asp:Label>
-
         <asp:Label ID="lblMensaje" runat="server" ForeColor="Red" />
 
+        <!-- =========================== -->
+        <!-- GridView de administración  -->
+        <!-- =========================== -->
         <asp:GridView ID="gvAdminProductos" runat="server"
             AutoGenerateColumns="False"
             CssClass="table table-bordered table-striped"
@@ -23,6 +26,7 @@
             OnRowDataBound="gvAdminProductos_RowDataBound"
             OnRowCommand="gvAdminProductos_RowCommand">
             <Columns>
+
                 <%-- Clave --%>
                 <asp:BoundField DataField="Codigo" HeaderText="Código" ReadOnly="True" />
 

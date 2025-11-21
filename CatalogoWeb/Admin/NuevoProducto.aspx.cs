@@ -19,6 +19,26 @@ namespace CatalogoWeb.Admin
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // 1) Debe estar autenticado
+            if (!Request.IsAuthenticated)
+            {
+                System.Web.Security.FormsAuthentication.RedirectToLoginPage();
+                return;
+            }
+
+            // 2) Debe ser admin
+            bool isAdmin =
+                (Session["IsAdmin"] is bool b && b) ||
+                (Session["Admin"] is bool c && c);
+
+            if (!isAdmin)
+            {
+                // Si no es admin, lo mandamos al inicio
+                Response.Redirect("~/Default.aspx");
+                return;
+            }
+
+            // 3) Solo la primera vez se cargan combos
             if (!IsPostBack)
             {
                 CargarCategorias();
@@ -46,7 +66,8 @@ namespace CatalogoWeb.Admin
         private void CargarMarcas()
         {
             using (SqlConnection con = new SqlConnection(cnx))
-            using (SqlDataAdapter da = new SqlDataAdapter("SELECT Id, Descripcion FROM MARCAS ORDER BY Descripcion", con))
+            using (SqlDataAdapter da = new SqlDataAdapter(
+                "SELECT Id, Descripcion FROM MARCAS WHERE Activo = 1 ORDER BY Descripcion", con))
             {
                 DataTable dt = new DataTable();
                 da.Fill(dt);

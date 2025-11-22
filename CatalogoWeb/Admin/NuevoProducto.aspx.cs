@@ -82,39 +82,62 @@ namespace CatalogoWeb.Admin
         // --- Botones ---
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
+            // Limpiar estado visual de errores antes de validar
+            LimpiarErroresCampos();
+            lblMsg.Text = "";
+            lblMsg.CssClass = "d-block mt-2";
+
             // 1) Validaciones mínimas de servidor (por si desactivan JS)
+
+            //validacion codigo
             if (string.IsNullOrWhiteSpace(txtCodigo.Text))
             {
-                ShowMsg("El código es obligatorio.", isError: true);
+                MarcarCodigoInvalido("El código es obligatorio.");
+                ShowModal("Error", "El código es obligatorio.");
                 return;
             }
+            //validacion nombre
             if (string.IsNullOrWhiteSpace(txtNombre.Text))
             {
-                ShowMsg("El nombre es obligatorio.", isError: true);
+                MarcarNombreInvalido("El nombre es obligatorio.");
+                ShowModal("Error", "El nombre es obligatorio.");
                 return;
             }
+            //validacion categoria
             if (string.IsNullOrEmpty(ddlCategoria.SelectedValue))
             {
-                ShowMsg("Seleccione una categoría.", isError: true);
+                MarcarCategoriaInvalida("Seleccione una categoría.");
+                ShowModal("Error", "Seleccione una categoría.");
                 return;
             }
+            //validacion marca
             if (string.IsNullOrEmpty(ddlMarca.SelectedValue))
             {
-                ShowMsg("Seleccione una marca.", isError: true);
+                MarcarMarcaInvalida("Seleccione una marca.");
+                ShowModal("Error", "Seleccione una marca.");
                 return;
             }
 
             // 2) Parseo de precio (acepta , o .)
+            if (string.IsNullOrWhiteSpace(txtPrecio.Text))
+            {
+                MarcarPrecioInvalido("El precio es obligatorio.");
+                ShowModal("Error", "El precio es obligatorio.");
+                return;
+            }
+
             if (!TryParsePrecio(txtPrecio.Text, out decimal precio))
             {
-                ShowMsg("Precio inválido. Use 1234,56 o 1234.56", isError: true);
+                MarcarPrecioInvalido("Precio inválido. Use 1234,56 o 1234.56");
+                ShowModal("Error", "Precio inválido. Use 1234,56 o 1234.56");
                 return;
             }
 
             // 3) Validar duplicado por Código
             if (ExisteCodigo(txtCodigo.Text.Trim()))
             {
-                ShowMsg("El código ya existe. Ingrese uno diferente.", isError: true);
+                MarcarCodigoInvalido("El código ya existe. Ingrese uno diferente.");
+                ShowModal("Error", "El código ya existe. Ingrese uno diferente.");
                 return;
             }
 
@@ -234,6 +257,95 @@ namespace CatalogoWeb.Admin
                 CultureInfo.InvariantCulture,
                 out value);
         }
+        private void LimpiarErroresCampos()
+        {
+            // Limpia estado visual 
+            // Código
+            if (txtCodigo != null)
+            {
+                txtCodigo.CssClass = txtCodigo.CssClass
+                    .Replace(" is-invalid", "")
+                    .Replace(" is-valid", "");
+                litCodigoError.Text = string.Empty;
+            }
+
+            // Nombre
+            if (txtNombre != null)
+            {
+                txtNombre.CssClass = txtNombre.CssClass
+                    .Replace(" is-invalid", "")
+                    .Replace(" is-valid", "");
+                litNombreError.Text = string.Empty;
+            }
+
+            // Precio
+            if (txtPrecio != null)
+            {
+                txtPrecio.CssClass = txtPrecio.CssClass
+                    .Replace(" is-invalid", "")
+                    .Replace(" is-valid", "");
+                litPrecioError.Text = string.Empty;
+            }
+            // Categoría
+            if (ddlCategoria != null)
+            {
+                ddlCategoria.CssClass = ddlCategoria.CssClass
+                    .Replace(" is-invalid", "")
+                    .Replace(" is-valid", "");
+                litCategoriaError.Text = string.Empty;
+            }
+
+            // Marca
+            if (ddlMarca != null)
+            {
+                ddlMarca.CssClass = ddlMarca.CssClass
+                    .Replace(" is-invalid", "")
+                    .Replace(" is-valid", "");
+                litMarcaError.Text = string.Empty;
+            }
+        }
+
+        private void MarcarCodigoInvalido(string mensaje)
+        {
+            if (!txtCodigo.CssClass.Contains("is-invalid"))
+                txtCodigo.CssClass += " is-invalid";
+
+            // Mensaje pequeño debajo del campo
+            litCodigoError.Text = $"<div class='invalid-feedback d-block'>{HttpUtility.HtmlEncode(mensaje)}</div>";
+        }
+        private void MarcarNombreInvalido(string mensaje)
+        {
+            if (!txtNombre.CssClass.Contains("is-invalid"))
+                txtNombre.CssClass += " is-invalid";
+
+            litNombreError.Text =
+                $"<div class='invalid-feedback d-block'>{HttpUtility.HtmlEncode(mensaje)}</div>";
+        }
+        private void MarcarPrecioInvalido(string mensaje)
+        {
+            if (!txtPrecio.CssClass.Contains("is-invalid"))
+                txtPrecio.CssClass += " is-invalid";
+
+            litPrecioError.Text =
+                $"<div class='invalid-feedback d-block'>{HttpUtility.HtmlEncode(mensaje)}</div>";
+        }
+        private void MarcarCategoriaInvalida(string mensaje)
+        {
+            if (!ddlCategoria.CssClass.Contains("is-invalid"))
+                ddlCategoria.CssClass += " is-invalid";
+
+            litCategoriaError.Text =
+                $"<div class='invalid-feedback d-block'>{HttpUtility.HtmlEncode(mensaje)}</div>";
+        }
+
+        private void MarcarMarcaInvalida(string mensaje)
+        {
+            if (!ddlMarca.CssClass.Contains("is-invalid"))
+                ddlMarca.CssClass += " is-invalid";
+
+            litMarcaError.Text =
+                $"<div class='invalid-feedback d-block'>{HttpUtility.HtmlEncode(mensaje)}</div>";
+        }
 
         private bool ExisteCodigo(string codigo)
         {
@@ -271,4 +383,5 @@ namespace CatalogoWeb.Admin
             );
         }
     }
+
 }

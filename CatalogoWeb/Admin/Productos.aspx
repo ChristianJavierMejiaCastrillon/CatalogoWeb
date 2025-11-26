@@ -25,6 +25,10 @@
             OnRowUpdating="gvAdminProductos_RowUpdating"
             OnRowDataBound="gvAdminProductos_RowDataBound"
             OnRowCommand="gvAdminProductos_RowCommand">
+
+            <%-- PASO A.1 --%>
+            <HeaderStyle CssClass="text-center align-middle" />
+
             <Columns>
 
                 <%-- Clave --%>
@@ -42,7 +46,13 @@
 
                 <%-- Descripcion --%>
                 <asp:TemplateField HeaderText="Descripción">
-                    <ItemTemplate><%# Eval("Descripcion") %></ItemTemplate>
+                    <ItemTemplate>
+                        <div class="small">
+                            <asp:Literal ID="litDescripcion" runat="server"
+                                Text='<%# Eval("Descripcion") == null ? "" : Eval("Descripcion").ToString().Replace(Environment.NewLine, "<br />") %>' />
+                        </div>
+                    </ItemTemplate>
+
                     <EditItemTemplate>
                         <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="2"
                             Text='<%# Bind("Descripcion") %>' />

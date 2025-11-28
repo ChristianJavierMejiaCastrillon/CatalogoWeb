@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace CatalogoWeb.Admin
@@ -71,6 +74,18 @@ namespace CatalogoWeb.Admin
                             break;
                     }
                 }
+                // ----- PRUEBA TEMPORAL -----
+                if (Request.QueryString["testmodal"] == "1")
+                {
+                    string js = "setTimeout(function(){ showAppMessage('Productos','Prueba de modal desde code-behind ✔'); }, 150);";
+                    ScriptManager.RegisterStartupScript(
+                        Page,
+                        Page.GetType(),
+                        "modalTest",
+                        js,
+                        true
+                    );
+                }
             }
         }
 
@@ -82,14 +97,14 @@ namespace CatalogoWeb.Admin
                 a.Nombre,
                 a.Descripcion,
                 a.IdMarca               AS MarcaId,          -- para el DropDown
-                m.Descripcion           AS MarcaNombre,      -- ASPX puede Eval('MarcaNombre')
+                m.Descripcion           AS MarcaNombre,      -- puede venir NULL
                 a.IdCategoria           AS CategoriaId,      -- para el DropDown
-                c.Descripcion           AS CategoriaNombre,  -- ASPX puede Eval('CategoriaNombre')
+                c.Descripcion           AS CategoriaNombre,  -- puede venir NULL
                 a.Precio,
                 a.ImagenUrl
         FROM dbo.ARTICULOS a
-        INNER JOIN dbo.MARCAS     m ON a.IdMarca     = m.Id
-        INNER JOIN dbo.CATEGORIAS c ON a.IdCategoria = c.Id
+        LEFT JOIN dbo.MARCAS     m ON a.IdMarca     = m.Id
+        LEFT JOIN dbo.CATEGORIAS c ON a.IdCategoria = c.Id
         ORDER BY a.Codigo;", cn))
             {
                 cn.Open();
@@ -105,7 +120,7 @@ namespace CatalogoWeb.Admin
         {
             using (var cn = new SqlConnection(Cnx))
             using (var da = new SqlDataAdapter(
-                "SELECT Id AS MarcaId, Descripcion AS Nombre FROM dbo.MARCAS ORDER BY Descripcion;", cn))
+                "SELECT Id AS MarcaId, Descripcion AS Nombre FROM dbo.MARCAS WHERE Activo = 1 ORDER BY Descripcion;", cn))
             {
                 var dt = new DataTable();
                 da.Fill(dt);
@@ -117,7 +132,7 @@ namespace CatalogoWeb.Admin
         {
             using (var cn = new SqlConnection(Cnx))
             using (var da = new SqlDataAdapter(
-                "SELECT Id AS CategoriaId, Descripcion AS Nombre FROM dbo.CATEGORIAS ORDER BY Descripcion;", cn))
+                "SELECT Id AS CategoriaId, Descripcion AS Nombre FROM dbo.CATEGORIAS WHERE Activo = 1 ORDER BY Descripcion;", cn))
             {
                 var dt = new DataTable();
                 da.Fill(dt);
@@ -188,8 +203,8 @@ namespace CatalogoWeb.Admin
             lblMensaje.Text = string.Empty;
 
             string codigo = gvAdminProductos.DataKeys[e.RowIndex].Value.ToString();
-
             var fila = gvAdminProductos.Rows[e.RowIndex];
+
             var txtNombre = (TextBox)fila.FindControl("txtNombre");
             var txtDescripcion = (TextBox)fila.FindControl("txtDescripcion");
             var ddlMarca = (DropDownList)fila.FindControl("ddlMarca");
@@ -202,39 +217,28 @@ namespace CatalogoWeb.Admin
             string nombre = txtNombre?.Text?.Trim() ?? "";
             string descripcion = txtDescripcion?.Text?.Trim() ?? "";
 
-            if (!int.TryParse(ddlMarca?.SelectedValue, out int idMarca)) { lblMensaje.Text = "Selecciona una marca válida."; return; }
-            if (!int.TryParse(ddlCategoria?.SelectedValue, out int idCategoria)) { lblMensaje.Text = "Selecciona una categoría válida."; return; }
-            if (!TryParsePrecio(txtPrecio?.Text, out decimal precio)) { lblMensaje.Text = "Precio inválido. Usa 1234,56 o 1234.56"; return; }
+            // ⬇️ DIAGNÓSTICO: leer tal cual vienen del DropDown
+            string valMarcaRaw = ddlMarca?.SelectedValue;
+            string valCatRaw = ddlCategoria?.SelectedValue;
 
-            // --- IMAGEN: archivo > URL escrita > actual ---
+            int idMarca = 0;
+            int idCategoria = 0;
+            int.TryParse(valMarcaRaw, out idMarca);
+            int.TryParse(valCatRaw, out idCategoria);
+
+            if (!TryParsePrecio(txtPrecio?.Text, out decimal precio))
+            { lblMensaje.Text = "Precio inválido."; return; }
+
+            // IMAGEN (igual que ya lo tenías)
             string imagenUrl = hdImagenActual?.Value ?? "";
-
             if (fuImagen != null && fuImagen.HasFile)
             {
-                string ext = Path.GetExtension(fuImagen.FileName)?.ToLowerInvariant() ?? "";
-                string[] ok = { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp" };
-                if (!ok.Contains(ext)) { lblMensaje.Text = "Formato no permitido (JPG/PNG/WEBP/GIF/BMP)."; return; }
-
-                string folderVirtual = "~/Imagenes"; // o "~/Uploads"
-                string folderFisico = Server.MapPath(folderVirtual);
-                if (!Directory.Exists(folderFisico)) Directory.CreateDirectory(folderFisico);
-
-                string baseName = Path.GetFileNameWithoutExtension(fuImagen.FileName);
-                if (string.IsNullOrWhiteSpace(baseName)) baseName = "img";
-                string safeBaseName = string.Join("_", baseName.Split(Path.GetInvalidFileNameChars()));
-
-                string nombreArchivo = $"{safeBaseName}_{codigo}_{DateTime.Now:yyyyMMddHHmmss}{ext}";
-                string rutaFisica = Path.Combine(folderFisico, nombreArchivo);
-
-                fuImagen.SaveAs(rutaFisica);
-                imagenUrl = $"{folderVirtual}/{nombreArchivo}";
+                // … (deja tu código actual aquí sin cambios)
             }
             else if (!string.IsNullOrWhiteSpace(txtImagenUrl?.Text))
             {
                 imagenUrl = txtImagenUrl.Text.Trim();
             }
-
-            // NORMALIZAR: si es ruta local, forzar "~/" para que luego ResolveUrl funcione
             if (!string.IsNullOrWhiteSpace(imagenUrl) &&
                 !imagenUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
                 !imagenUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
@@ -244,37 +248,55 @@ namespace CatalogoWeb.Admin
                     imagenUrl = imagenUrl.StartsWith("/") ? "~" + imagenUrl : "~/" + imagenUrl;
             }
 
-            using (var cn = new SqlConnection(Cnx))
-            using (var cmd = new SqlCommand(@"
-        UPDATE dbo.ARTICULOS
-           SET Nombre      = @Nombre,
-               Descripcion = @Descripcion,
-               IdMarca     = @IdMarca,
-               IdCategoria = @IdCategoria,
-               Precio      = @Precio,
-               ImagenUrl   = @ImagenUrl
-         WHERE Codigo      = @Codigo;", cn))
+            try
             {
-                cmd.Parameters.Add("@Nombre", SqlDbType.NVarChar, 200).Value = nombre;
-                cmd.Parameters.Add("@Descripcion", SqlDbType.NVarChar, -1).Value = (object)descripcion ?? DBNull.Value;
-                cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = idMarca;
-                cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = idCategoria;
+                using (var cn = new SqlConnection(Cnx))
+                using (var cmd = new SqlCommand(@"
+            UPDATE dbo.ARTICULOS
+               SET Nombre      = @Nombre,
+                   Descripcion = @Descripcion,
+                   IdMarca     = @IdMarca,
+                   IdCategoria = @IdCategoria,
+                   Precio      = @Precio,
+                   ImagenUrl   = @ImagenUrl
+             WHERE Codigo      = @Codigo;", cn))
+                {
+                    cmd.Parameters.Add("@Nombre", SqlDbType.NVarChar, 200).Value = nombre;
+                    cmd.Parameters.Add("@Descripcion", SqlDbType.NVarChar, -1).Value = (object)descripcion ?? DBNull.Value;
 
-                var p = cmd.Parameters.Add("@Precio", SqlDbType.Decimal);
-                p.Precision = 18; p.Scale = 2; p.Value = precio;
+                    // ⬇️ CLAVE: permitir 0 = (Sin marca / Sin categoría) ⇒ NULL en BD
+                    cmd.Parameters.Add("@IdMarca", SqlDbType.Int).Value = (idMarca == 0 ? (object)DBNull.Value : idMarca);
+                    cmd.Parameters.Add("@IdCategoria", SqlDbType.Int).Value = (idCategoria == 0 ? (object)DBNull.Value : idCategoria);
 
-                cmd.Parameters.Add("@ImagenUrl", SqlDbType.NVarChar, 300).Value = (object)imagenUrl ?? DBNull.Value;
-                cmd.Parameters.Add("@Codigo", SqlDbType.NVarChar, 50).Value = codigo;
+                    var p = cmd.Parameters.Add("@Precio", SqlDbType.Decimal); p.Precision = 18; p.Scale = 2; p.Value = precio;
+                    cmd.Parameters.Add("@ImagenUrl", SqlDbType.NVarChar, 300).Value = (object)imagenUrl ?? DBNull.Value;
+                    cmd.Parameters.Add("@Codigo", SqlDbType.NVarChar, 50).Value = codigo;
 
-                cn.Open();
-                cmd.ExecuteNonQuery();
+                    cn.Open();
+                    int rows = cmd.ExecuteNonQuery();
+
+                    if (rows == 0)
+                    {
+                        lblMensaje.CssClass = "alert alert-warning d-block";
+                        lblMensaje.Text = "No se actualizó ninguna fila (verifica el código).";
+                        return;
+                    }
+                }
+
+                // OK
+                Response.Redirect("~/Admin/Productos.aspx?msg=actualizado", endResponse: false);
+                return;
             }
-
-            // Importante: redirigir para evitar reenvío y mostrar el aviso
-            Response.Redirect("~/Admin/Productos.aspx?msg=actualizado", endResponse: false);
-            return;
+            catch (Exception ex)
+            {
+                // ⬇️ Mostrar diagnóstico claro en pantalla
+                lblMensaje.CssClass = "alert alert-danger d-block";
+                lblMensaje.Text =
+                    $"Error al actualizar. MarcaSel='{valMarcaRaw}', CatSel='{valCatRaw}'. Detalle: {ex.Message}";
+                gvAdminProductos.EditIndex = -1;  // salir de edición para evitar bucles
+                CargarProductos();
+            }
         }
-
 
         protected void gvAdminProductos_RowCommand(object sender, GridViewCommandEventArgs e)
         {
@@ -316,6 +338,53 @@ namespace CatalogoWeb.Admin
         protected void btnNuevo_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/Admin/NuevoProducto.aspx");
+        }
+        private void ShowModal(string titulo, string mensaje)
+        {
+            // Escapa comillas y caracteres especiales para JS
+            string safeTitle = HttpUtility.JavaScriptStringEncode(titulo ?? "Mensaje");
+            string safeBody = HttpUtility.JavaScriptStringEncode(mensaje ?? "");
+            string js = $"showAppMessage('{safeTitle}','{safeBody}');";
+
+            // Usa ScriptManager (funciona con UpdatePanel también)
+            ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(), js, true);
+        }
+        private decimal ParsePrecio(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                throw new ArgumentException("El precio es obligatorio.");
+
+            // admite coma o punto como separador decimal
+            string norm = input.Trim().Replace(',', '.');
+
+            if (!decimal.TryParse(norm, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var precio))
+                throw new ArgumentException("Formato de precio inválido. Usa 99.99 o 99,99.");
+
+            if (precio <= 0) throw new ArgumentException("El precio debe ser mayor a 0.");
+            return decimal.Round(precio, 2);
+        }
+        private bool CodigoExiste(string codigo)
+        {
+            const string sql = "SELECT COUNT(1) FROM PRODUCTOS WHERE Codigo=@Codigo";
+            using (var cn = new SqlConnection(Cnx))
+            using (var cmd = new SqlCommand(sql, cn))
+            {
+                cmd.Parameters.AddWithValue("@Codigo", codigo);
+                cn.Open();
+                return (int)cmd.ExecuteScalar() > 0;
+            }
+        }
+        private bool CodigoUsadoPorOtro(string codigoNuevo, string codigoActual)
+        {
+            const string sql = "SELECT COUNT(1) FROM PRODUCTOS WHERE Codigo=@Nuevo AND Codigo<>@Actual";
+            using (var cn = new SqlConnection(Cnx))
+            using (var cmd = new SqlCommand(sql, cn))
+            {
+                cmd.Parameters.AddWithValue("@Nuevo", codigoNuevo);
+                cmd.Parameters.AddWithValue("@Actual", codigoActual);
+                cn.Open();
+                return (int)cmd.ExecuteScalar() > 0;
+            }
         }
     }
  }

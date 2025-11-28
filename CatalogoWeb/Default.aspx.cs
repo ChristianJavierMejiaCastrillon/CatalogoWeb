@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Datos;
+using Dominio;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Text;
 using System.Web.UI.WebControls;
-using Datos;
-using Dominio;
 //using Negocio; // (La agregaremos más adelante cuando hagamos la capa de negocio)
 
 namespace CatalogoWeb
@@ -88,6 +89,37 @@ namespace CatalogoWeb
         {
             gvProductos.PageIndex = e.NewPageIndex;
             CargarProductos(); // Recarga los productos con la nueva página seleccionada
+        }
+        protected string FormatearDescripcion(object descripcionObj)
+        {
+            if (descripcionObj == null)
+                return string.Empty;
+
+            string desc = descripcionObj.ToString();
+            if (string.IsNullOrWhiteSpace(desc))
+                return string.Empty;
+
+            var lineas = desc.Split(
+                new[] { "\r\n", "\n" },
+                StringSplitOptions.RemoveEmptyEntries
+            );
+
+            if (lineas.Length == 0)
+                return string.Empty;
+
+            var sb = new StringBuilder();
+            sb.Append("<ul class='mb-0 ps-3'>");
+
+            foreach (var linea in lineas)
+            {
+                sb.Append("<li>");
+                // Por seguridad, codificamos el texto
+                sb.Append(Server.HtmlEncode(linea));
+                sb.Append("</li>");
+            }
+
+            sb.Append("</ul>");
+            return sb.ToString();
         }
     }
 }

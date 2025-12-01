@@ -27,6 +27,9 @@ Su objetivo es gestionar un **catálogo de productos** con panel de administraci
 ---
 
 ## 🧠 Próximo objetivo
+-Agregar funcionalidades para el control del inventarios, productos en stock, cantidad en tienda o agotados.
+-Agregar funcionalidades de contabilidad, productos vendidos, productos comprados al proveedor, ventas diarias y mensuales, etc....
+-Agregar funcionalidades para agregar productos al carrito.
 
 
 ---

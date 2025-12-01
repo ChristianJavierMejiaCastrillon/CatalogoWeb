@@ -5,14 +5,17 @@
         <h2>Panel de Administración - Productos</h2>
         <hr />
 
+        <!-- Botón "Nuevo" -->
         <asp:Button ID="btnNuevo" runat="server" Text="➕ Nuevo producto"
             CssClass="btn btn-outline-primary mb-3 fw-bold" OnClick="btnNuevo_Click" />
-        
-        <!-- Aviso -->
-        <asp:Label ID="lblAviso" runat="server" Visible="false"></asp:Label>
 
+        <!-- Avisos -->
+        <asp:Label ID="lblAviso" runat="server" Visible="false"></asp:Label>
         <asp:Label ID="lblMensaje" runat="server" ForeColor="Red" />
 
+        <!-- =========================== -->
+        <!-- GridView de administración  -->
+        <!-- =========================== -->
         <asp:GridView ID="gvAdminProductos" runat="server"
             AutoGenerateColumns="False"
             CssClass="table table-bordered table-striped"
@@ -22,7 +25,12 @@
             OnRowUpdating="gvAdminProductos_RowUpdating"
             OnRowDataBound="gvAdminProductos_RowDataBound"
             OnRowCommand="gvAdminProductos_RowCommand">
+
+            <%-- PASO A.1 --%>
+            <HeaderStyle CssClass="text-center align-middle" />
+
             <Columns>
+
                 <%-- Clave --%>
                 <asp:BoundField DataField="Codigo" HeaderText="Código" ReadOnly="True" />
 
@@ -38,28 +46,40 @@
 
                 <%-- Descripcion --%>
                 <asp:TemplateField HeaderText="Descripción">
-                    <ItemTemplate><%# Eval("Descripcion") %></ItemTemplate>
+                    <ItemTemplate>
+                        <div class="small">
+                            <asp:Literal ID="litDescripcion" runat="server"
+                                Text='<%# Eval("Descripcion") == null ? "" : Eval("Descripcion").ToString().Replace(Environment.NewLine, "<br />") %>' />
+                        </div>
+                    </ItemTemplate>
+
                     <EditItemTemplate>
                         <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="2"
                             Text='<%# Bind("Descripcion") %>' />
                     </EditItemTemplate>
                 </asp:TemplateField>
 
-                <%-- Marca --%>
+                <%-- Vista normal --%>
                 <asp:TemplateField HeaderText="Marca">
-                    <ItemTemplate><%# Eval("MarcaNombre") %></ItemTemplate>
+                    <ItemTemplate>
+                        <%# string.IsNullOrEmpty(Eval("MarcaNombre") as string) ? "(Sin marca)" : Eval("MarcaNombre") %>
+                    </ItemTemplate>
+
+                    <%-- Modo edición: DropDown--%>
                     <EditItemTemplate>
-                        <asp:DropDownList ID="ddlMarca" runat="server" CssClass="form-select"></asp:DropDownList>
                         <asp:HiddenField ID="hdMarcaIdActual" runat="server" Value='<%# Eval("MarcaId") %>' />
+                        <asp:DropDownList ID="ddlMarca" runat="server" CssClass="form-select form-select-sm"></asp:DropDownList>
                     </EditItemTemplate>
                 </asp:TemplateField>
 
-                <%-- Categoria --%>
                 <asp:TemplateField HeaderText="Categoría">
-                    <ItemTemplate><%# Eval("CategoriaNombre") %></ItemTemplate>
+                    <ItemTemplate>
+                        <%# string.IsNullOrEmpty(Eval("CategoriaNombre") as string) ? "(Sin categoría)" : Eval("CategoriaNombre") %>
+                    </ItemTemplate>
+
                     <EditItemTemplate>
-                        <asp:DropDownList ID="ddlCategoria" runat="server" CssClass="form-select"></asp:DropDownList>
                         <asp:HiddenField ID="hdCategoriaIdActual" runat="server" Value='<%# Eval("CategoriaId") %>' />
+                        <asp:DropDownList ID="ddlCategoria" runat="server" CssClass="form-select form-select-sm"></asp:DropDownList>
                     </EditItemTemplate>
                 </asp:TemplateField>
 

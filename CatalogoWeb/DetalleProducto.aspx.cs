@@ -35,7 +35,27 @@ namespace CatalogoWeb
             {
                 lblNombre.Text = articulo.Nombre;
                 lblCodigo.Text = articulo.Codigo;
-                lblDescripcion.Text = articulo.Descripcion;
+                // Descripción con saltos de línea
+                if (!string.IsNullOrEmpty(articulo.Descripcion))
+                {
+                    // Dividir por líneas
+                    var lineas = articulo.Descripcion
+                        .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                    // Convertir cada línea en <li> "Puntos de lista"
+                    string listaHtml = "<ul class='mb-3'>";
+                    foreach (var linea in lineas)
+                    {
+                        listaHtml += $"<li>{linea}</li>";
+                    }
+                    listaHtml += "</ul>";
+
+                    lblDescripcion.Text = listaHtml;
+                }
+                else
+                {
+                    lblDescripcion.Text = "";
+                }
                 lblMarca.Text = articulo.Marca.Descripcion;
                 lblCategoria.Text = articulo.Categoria.Descripcion;
                 lblPrecio.Text = articulo.Precio.ToString("C");

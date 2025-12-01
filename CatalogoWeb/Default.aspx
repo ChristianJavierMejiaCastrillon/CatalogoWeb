@@ -3,6 +3,21 @@
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <h2 class="text-center">Catálogo de Productos</h2>
 
+    <style>
+        .product-link {
+            color: #0d6efd;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+
+            .product-link:hover {
+                color: #0a58ca;
+                text-decoration: underline;
+            }
+    </style>
+
+
     <!-- Filtros -->
     <div class="row mb-3">
         <div class="col-md-4">
@@ -20,21 +35,42 @@
     </div>
 
     <!-- GridView para mostrar los productos -->
-    <asp:GridView ID="gvProductos" CssClass="table table-bordered table-striped" runat="server" AutoGenerateColumns="False" AllowPaging="True" PageSize="10"
+    <asp:GridView ID="gvProductos" CssClass="table table-bordered table-striped text-center" runat="server"
+        AutoGenerateColumns="False" AllowPaging="True" PageSize="10"
         OnPageIndexChanging="gvProductos_PageIndexChanging">
+
+        <%-- Centrar encabezados en pagina de inicio --%>
+        <HeaderStyle CssClass="text-center align-middle" />
 
         <Columns>
             <asp:BoundField DataField="Codigo" HeaderText="Código" />
 
+            <%-- Se estiliza el link del nombre del producto --%>
             <asp:TemplateField HeaderText="Nombre">
+                <%-- Centramos también el header --%>
+                <HeaderStyle CssClass="text-center" />
+                <ItemStyle CssClass="text-center" />
+
                 <ItemTemplate>
-                    <a href='DetalleProducto.aspx?id=<%# Eval("Id") %>'>
+                    <a href='DetalleProducto.aspx?id=<%# Eval("Id") %>' class="product-link">
                         <%# Eval("Nombre") %>
                     </a>
                 </ItemTemplate>
             </asp:TemplateField>
 
-            <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
+
+            <%-- Se ponen saltos de linea a los textos de la descripcion --%>
+            <asp:TemplateField HeaderText="Descripción">
+                <%-- Se alinea texto a la izquierda --%>
+                <ItemStyle CssClass="text-start" />
+                <ItemTemplate>
+                    <div class="small">
+                        <asp:Literal ID="litDescripcion" runat="server"
+                            Text='<%# FormatearDescripcion(Eval("Descripcion")) %>' />
+                    </div>
+                </ItemTemplate>
+            </asp:TemplateField>
+
             <asp:BoundField DataField="Marca" HeaderText="Marca" />
             <asp:BoundField DataField="Categoria" HeaderText="Categoría" />
             <asp:BoundField DataField="Precio" HeaderText="Precio" DataFormatString="{0:C}" HtmlEncode="false" />
